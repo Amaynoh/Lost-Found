@@ -5,11 +5,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ObjetController;
 
+Route::get('/objets/filter', [ObjetController::class, 'filter']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/objets', [ObjetController::class, 'index']);
 Route::get('/objets/{id}', [ObjetController::class, 'show']);
-Route::get('/objets/filter', [ObjetController::class, 'filter']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
