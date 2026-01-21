@@ -27,7 +27,8 @@ class StoreObjetRequest extends FormRequest
             'type' => 'required|in:perdu,trouvé',
             'location' => 'required|string',
             'date' => 'required|date',
-            'status' => 'nullable|string'
+            'status' => 'nullable|string',
+            'image' => 'nullable|image|max:2048'
         ];
     }
 }
