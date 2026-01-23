@@ -1,3 +1,65 @@
+# Lost & Found – Backend (Laravel API)
+
+## Contexte du projet
+Ce projet s’inscrit dans le développement d’une application web *Lost & Found* destinée à permettre la déclaration, la consultation et la gestion d’objets perdus ou trouvés.
+
+L’application est conçue pour des environnements tels que :
+- universités
+- gares
+- administrations
+- entreprises
+Le backend fournit une API REST sécurisée consommée par un frontend React.
+## Diagramme de cas d’utilisation & de classes
+![Diagramme de classes]&[Diagramme de cas d’utilisation](https://miro.com/welcomeonboard/VUx4eFgvZmM1bi9ITW9SUHhod3pvYnpWMHlGZVNXaFg2QzNld3FoYkNTYTFyTStjVVluK1oyWGkyNDdHL2d1SWFKZ1VQdlc4Z0tORS9DenhZYzRGdWZlVGt2enVoNHp1TWZEMFdNamdrVHNaTWJ6ejdncGdxUERycVo2bVV5TFR0R2lncW1vRmFBVnlLcVJzTmdFdlNRPT0hdjE=?share_link_id=799311431531)
+
+## Objectifs
+- Mettre en place une API REST avec Laravel
+- Implémenter une authentification sécurisée
+- Gérer des rôles (`user`, `admin`)
+- Permettre un CRUD complet des objets
+- Appliquer des règles d’autorisation via les Policies
+- Tester les fonctionnalités principales avec PHPUnit
+
+## Technologies utilisées
+- PHP 8.x
+- Laravel 10
+- Laravel Sanctum (authentification API)
+- MySQL
+- PHPUnit (tests)
+- Docker / Docker Compose
+
+## Fonctionnalités principales
+
+### Authentification
+- Inscription et connexion des utilisateurs
+- Attribution automatique du rôle `user`
+- Authentification par token (Sanctum)
+
+### Gestion des objets
+- Déclaration d’objets perdus ou trouvés
+- Consultation de la liste des objets
+- Filtrage par type et lieu
+- Modification et suppression selon les droits
+
+### Autorisation
+- Gestion des droits via Policies
+- L’utilisateur peut gérer uniquement ses propres objets
+- L’administrateur dispose d’un accès global
+
+## Rôles
+- **User** : gérer ses propres déclarations
+- **Admin** : gérer toutes les déclarations
+
+## Architecture
+- Controllers : gestion des requêtes HTTP
+- Requests : validation des données
+- Policies : règles d’autorisation
+- Tests Feature : tests des endpoints API
+
+## Tests
+Les tests unitaires et fonctionnels sont implémentés avec PHPUnit.
+php artisan test
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
