@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
-use GuzzleHttp\Psr7\UploadedFile;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class ObjetTest extends TestCase
@@ -15,7 +15,7 @@ class ObjetTest extends TestCase
     use RefreshDatabase; 
 
      /** @test */
-    public function user_can_get_objets_list()
+    public function index()
     {
         Objets::factory()->count(2)->create();
 
@@ -25,7 +25,7 @@ class ObjetTest extends TestCase
                  ->assertJsonCount(2);
     }
     /** @test */
-    public function user_can_filter_objets_by_type()
+    public function filter()
     {
         Objets::factory()->create(['type' => 'perdu']);
         Objets::factory()->create(['type' => 'trouve']);
@@ -37,7 +37,7 @@ class ObjetTest extends TestCase
     }
        
     /** @test */
-    public function owner_can_update_his_objet()
+    public function update()
     {
         $user = User::factory()->create();
         $objet = Objets::factory()->create(['user_id' => $user->id]);
@@ -51,4 +51,45 @@ class ObjetTest extends TestCase
             'title' => 'Titre modifié'
         ]);
     }
+        /** @test */
+    public function store()
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create();
+
+        $data = [
+            'title' => 'Téléphone',
+            'description' => 'Téléphone perdu',
+            'type' => 'perdu',
+            'location' => 'Casablanca',
+            'date' => '2026-01-21',
+            'image' => UploadedFile::fake()->image('test.jpg'),
+        ];
+
+        $response = $this->actingAs($user, 'sanctum')
+                         ->postJson('/api/objets', $data);
+
+        $response->assertStatus(201);
+
+        $this->assertDatabaseHas('objets', [
+            'title' => 'Téléphone'
+        ]);
+    }
+    /** @test */
+    public function admin_can_delete()
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $objet = Objets::factory()->create();
+
+        $response = $this->actingAs($admin, 'sanctum')
+                         ->deleteJson("/api/objets/{$objet->id}");
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseMissing('objets', [
+            'id' => $objet->id
+        ]);
+    }
+
 }

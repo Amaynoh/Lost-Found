@@ -12,7 +12,7 @@ class AuthTest extends TestCase
     use RefreshDatabase;
     
     /** @test */
-    public function un_utilisateur_peut_s_inscrire()
+    public function registre()
     {
         $data = [
             'name'     => 'Amina',
@@ -39,7 +39,7 @@ class AuthTest extends TestCase
         ]);
     }
         /** @test */
-    public function un_utilisateur_peut_se_connecter()
+    public function login()
     {
         $user = User::create([
             'name' => 'Amina',
@@ -60,7 +60,7 @@ class AuthTest extends TestCase
                  ]);
     }
     /** @test */
-    public function un_utilisateur_peut_se_deconnecter()
+    public function logout()
     {
         $user = User::create([
             'name' => 'Amina',

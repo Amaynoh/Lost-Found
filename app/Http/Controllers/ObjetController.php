@@ -6,12 +6,11 @@ use Illuminate\Http\Request;
 use App\Http\Requests\StoreObjetRequest;
 use App\Http\Requests\UpdateObjetRequest;
 use Illuminate\Support\Facades\Storage;
-
 class ObjetController extends Controller
 {
     public function index()
     {
-        return response()->json(Objets::all());
+        return response()->json(['success' => true, 'data' => Objets::all()], 200);
     }
 
     public function filter(Request $request)
@@ -26,83 +25,75 @@ class ObjetController extends Controller
             $query->where('location', 'like', '%' . $request->location . '%');
         }
 
-        return response()->json($query->get());
+        return response()->json(['success' => true, 'data' => $query->get()], 200);
     }
 
     public function store(StoreObjetRequest $request)
     {
-        $imagePath = null;
+        $this->authorize('create', Objets::class);
 
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('images', 'public');
-        }
+        $imagePath = $request->hasFile('image')
+            ? $request->file('image')->store('images', 'public')
+            : null;
 
         $objet = Objets::create([
-            'title'       => $request->title,
-            'description' => $request->description,
-            'type'        => $request->type,
-            'location'    => $request->location,
-            'date'        => $request->date,
-            'image'       => $imagePath,  
-            'user_id'     => $request->user()->id,
+            ...$request->validated(),
+            'image' => $imagePath,
+            'user_id' => $request->user()->id,
         ]);
 
-        return response()->json($objet, 201);
+        return response()->json([
+            'success' => true,
+            'message' => 'Objet créé avec succès.',
+            'data' => $objet
+        ], 201);
     }
 
     public function show($id)
     {
-        return response()->json(Objets::findOrFail($id));
+        $objet = Objets::findOrFail($id);
+        return response()->json(['success' => true, 'data' => $objet], 200);
     }
 
     public function update(UpdateObjetRequest $request, $id)
     {
         $objet = Objets::findOrFail($id);
-        $user  = $request->user();
-
-        if ($objet->user_id !== $user->id && $user->role !== 'admin') {
-            return response()->json(['message' => 'Non autorisé'], 403);
-        }
-
-        if ($request->has('status') && $user->role === 'admin') {
-            $objet->status = $request->status;
-        }
+        $this->authorize('update', $objet);
 
         if ($request->hasFile('image')) {
-            if ($objet->image) {
-                Storage::disk('public')->delete($objet->image);
-            }
+            if ($objet->image) Storage::disk('public')->delete($objet->image);
             $objet->image = $request->file('image')->store('images', 'public');
         }
 
-        $fields = ['title', 'description', 'type', 'location', 'date'];
-        foreach ($fields as $field) {
-            if ($request->has($field)) {
-                $objet->$field = $request->$field;
-            }
-        }
-
+        $objet->fill($request->validated());
         $objet->save();
-        return response()->json($objet);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Objet mis à jour avec succès.',
+            'data' => $objet
+        ], 200);
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
         $objet = Objets::findOrFail($id);
-        $user  = $request->user();
+        $this->authorize('delete', $objet);
 
-        if ($objet->user_id !== $user->id && $user->role !== 'admin') {
-            return response()->json(['message' => 'Non autorisé'], 403);
-        }
-
+        if ($objet->image) Storage::disk('public')->delete($objet->image);
         $objet->delete();
 
-        return response()->json(['message' => 'Objet supprimé']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Objet supprimé avec succès.'
+        ], 200);
     }
 
     public function myObjects(Request $request)
     {
-        return response()->json($request->user()->objets);
+        return response()->json([
+            'success' => true,
+            'data' => $request->user()->objets
+        ], 200);
     }
 }
-
